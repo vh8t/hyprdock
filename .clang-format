@@ -1,0 +1,2 @@
+AllowShortFunctionsOnASingleLine: None
+BasedOnStyle: LLVM
