@@ -23,6 +23,8 @@ struct State {
 
   int clicked_app = -1;
 
+  double prevoius_time;
+
   Rectangle hover_area;
 
   std::string active_workspace;

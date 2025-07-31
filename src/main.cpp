@@ -8,6 +8,16 @@
 #include "hyprdock.hpp"
 #include "utils.hpp"
 
+#define FPS(fps) (1.0f / fps)
+
+#define OVERLAY_OPACITY 50
+
+#define FADE_IN_TIME 0.3
+#define FADE_OUT_TIME 0.2
+
+#define FADE_IN(fps) static_cast<int>(OVERLAY_OPACITY / (fps * FADE_IN_TIME))
+#define FADE_OUT(fps) static_cast<int>(OVERLAY_OPACITY / (fps * FADE_OUT_TIME))
+
 int main(void) {
   hyprdock::State state;
   if (!state)
@@ -15,6 +25,8 @@ int main(void) {
 
   const int unknown_width = MeasureText("?", 20);
   const int font_size = state.config.app_size / 2;
+
+  state.prevoius_time = GetTime();
 
   while (!WindowShouldClose()) {
     if (IsKeyPressed(KEY_Q) &&
@@ -24,6 +36,12 @@ int main(void) {
     auto current_time = std::chrono::steady_clock::now();
     auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(
         current_time - state.last_command_time);
+
+    double delta_time = GetTime() - state.prevoius_time;
+    if (delta_time < FPS(state.fps))
+      usleep((FPS(state.fps) - delta_time) * 1000000);
+
+    state.prevoius_time = GetTime();
 
     if (elapsed_time >= state.command_interval) {
       state.last_command_time = current_time;
@@ -43,6 +61,7 @@ int main(void) {
                 hyprland::command::move_window_to_workspace(
                     state.uuid, state.active_workspace, state.sock_path);
                 hyprland::command::move_mouse(state.mouse_pos, state.sock_path);
+                SetWindowPosition(state.window_x, state.window_y);
                 state.is_minimized = false;
                 state.waiting = false;
               }
@@ -69,7 +88,7 @@ int main(void) {
     BeginDrawing();
     ClearBackground(state.config.dock_color);
 
-    SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    bool hover = false;
     int cursor = state.config.dock_padding;
     for (int i = 0; i < state.config.applications.size(); i++) {
       const auto &app = state.config.applications[i];
@@ -93,8 +112,10 @@ int main(void) {
       Vector2 win_mouse_pos = GetMousePosition();
       if (CheckCollisionPointRec(win_mouse_pos, overlay_rect)) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-        if (state.animations[i] < 50)
-          state.animations[i] += 3;
+        hover = true;
+        if (state.animations[i] < OVERLAY_OPACITY)
+          state.animations[i] =
+              std::clamp(state.animations[i] + FADE_IN(state.fps), 0, 50);
 
         Color overlay{180, 180, 180, state.animations[i]};
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
@@ -123,7 +144,8 @@ int main(void) {
           state.clicked_app = -1;
         }
       } else if (state.animations[i] > 0) {
-        state.animations[i] = std::clamp(state.animations[i] - 5, 0, 50);
+        state.animations[i] =
+            std::clamp(state.animations[i] - FADE_OUT(state.fps), 0, 50);
         DrawRectangleRounded(overlay_rect, 0.1, 0,
                              Color{180, 180, 180, state.animations[i]});
       }
@@ -164,6 +186,9 @@ int main(void) {
       // Move draw cursor
       cursor += state.config.app_size + state.config.app_padding;
     }
+
+    if (!hover)
+      SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
     EndDrawing();
   }

@@ -57,7 +57,7 @@ State::State(void) {
   this->window_x = (this->monitor.width - this->dock_width) / 2;
   this->window_y =
       this->monitor.height - this->dock_height - this->config.dock_margin;
-  this->fps = 60;
+  this->fps = 30;
 
   this->hover_area = Rectangle{
       .x = static_cast<float>(this->window_x),
@@ -91,7 +91,7 @@ State::State(void) {
   SetWindowMonitor(this->monitor.id);
 
   SetWindowPosition(this->window_x, this->window_y);
-  SetTargetFPS(this->fps);
+  // SetTargetFPS(this->fps);
   SetExitKey(0); // Disable default exit key
 
   for (const auto &app : this->config.applications) {
