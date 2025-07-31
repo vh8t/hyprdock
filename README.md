@@ -1,7 +1,7 @@
 # Hyprdock
 
 Hyprdock is a simple and lightweight dock bar designed specifically for the Hyprland compositor. Built to be a hassle-free, out-of-the-box solution, it provides a clean and efficient workspace with a simple JSON configuration. Developed in C++, it delivers a high-performance and stable experience.
-<br>
+<br><br>
 Thanks to a custom Hyprland IPC library, Hyprdock has direct access to low-level Hyprland functionalities. This allows it to get real-time information such as **mouse position, windows on the desktop, and active workspaces**. This deep integration is what enables Hyprdock to intelligently manage your applications.
 
 ## Features
@@ -21,7 +21,7 @@ Before building Hyprdock, ensure you have the following dependencies installed o
 
 ## Building and Installation
 Hyprdock includes a `build.sh` script to simplify the building and installation process.
-<br>
+<br><br>
 Follow these steps to build and install Hyprdock:
 
 ```sh
@@ -39,7 +39,7 @@ sudo cmake --install build
 
 ## Configuration
 Hyprdock's behavior is controlled by a single configuration file located at `~/.config/hypr/hyprdock.json`. If this file doesn't exist, the dock will appear as an empty window. You must create it and add your desired configuration.
-<br>
+<br><br>
 Here is an example of the configuration format:
 
 ```json
