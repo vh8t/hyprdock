@@ -71,6 +71,7 @@ int main(void) {
           }
         } else if (!state.is_minimized) {
           hyprland::command::hide_window(state.uuid, state.sock_path);
+          SetWindowPosition(state.window_x, state.window_y);
           state.is_minimized = true;
           // Deselect app if the window gets hidden
           state.clicked_app = -1;
